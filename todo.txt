@@ -1,0 +1,6 @@
+Look at the code in project. I currently compare frequency distributions. We need to compare LDA distributions. 
+
+- We need to add back in the words removed when we removed the stopwords. Maybe steal the code from the insert CSP solver?
+Perhaps we can read in a corpus and do a simple markov model... we'll just be filling in simple verbs and articles
+
+- We also need to remove the non unicode characters

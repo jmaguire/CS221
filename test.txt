@@ -1,0 +1,1 @@
+This is wrong because the size of the domains have shrunk and the indices generated here no long corresponds to the original indices of the values. While this may seem obvious in retrospect, it could confuse people who might have other problems with their 1e implementation. Hence, I've decided to split up the test.

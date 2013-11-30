@@ -1,0 +1,57 @@
+Modern cryptography abandons the assumption that the Adversary has available in¯nite computing resources,
+and assumes instead that the adversary's computation is resource bounded in some reasonable way. In particular,
+in these notes we will assume that the adversary is a probabilistic algorithm who runs in polynomial time.
+Similarly, the encryption and decryption algorithms designed are probabilistic and run in polynomial time.
+The running time of the encryption, decryption, and the adversary algorithms are all measured as a function
+of a security parameter k which is a parameter which is ¯xed at the time the cryptosystem is setup. Thus,
+when we say that the adversary algorithm runs in polynomial time, we mean time bounded by some polynomial
+function in k.
+Accordingly, in modern cryptography, we speak of the infeasibility of breaking the encryption system and
+computing information about exchanged messages where as historically one spoke of the impossibility of breaking
+the encryption system and ¯nding information about exchanged messages. We note that the encryption systems
+which we will describe and claim \secure" with respect to the new adversary are not \secure" with respect to a
+computationally unbounded adversary in the way that the one-time pad system was secure against an unbounded
+adversary. But, on the other hand, it is no longer necessarily true that the size of the secret key that A and
+B meet and agree on before remote transmission must be as long as the total number of secret bits ever to
+be exchanged securely remotely. In fact, at the time of the initial meeting, A and B do not need to know in
+advance how many secret bits they intend to send in the future.
+We will show how to construct such encryption systems, for which the number of messages to be exchanged
+securely can be a polynomial in the length of the common secret key. How we construct them brings us to
+anther fundamental issue, namely that of cryptographic, or complexity, assumptions.
+As modern cryptography is based on a gap between e±cient algorithms for encryption for the legitimate users
+versus the computational infeasibility of decryption for the adversary, it requires that one have available primitives with certain special kinds of computational hardness properties. Of these, perhaps the most basic is a
+one-way function . Informally, a function is one-way if it is easy to compute but hard to invert. Other primitives include pseudo-random number generators, and pseudorandom function families, which we will de¯ne and
+discuss later. From such primitives, it is possible to build secure encryption schemes.
+Thus, a central issue is where these primitives come from. Although one-way functions are widely believed to
+exist, and there are several conjectured candidate one-way functions which are widely used, we currently do
+not know how to mathematically prove that they actually exist. We shall thus design cryptographic schemes
+assuming we are given a one-way function. We will use the conjectured candidate one-way functions for our
+working examples, throughout our notes. We will be explicit about what exactly can and cannot be proved and
+is thus assumed, attempting to keep the latter to a bare minimum.
+Cryptography: Lecture Notes 13
+We shall elaborate on various constructions of private-key encryption algorithms later in the course.
+The development of public key cryptography in the seventies enables one to drop the requirement that A and
+B must share a key in order to encrypt. The receiver B can publish authenticated
+2
+information (called the
+public-key) for anyone including the adversary, the sender A, and any other sender to read at their convenience
+(e.g in a phone book). We will show encryption algorithms in which whoever can read the public key can send
+encrypted messages to B without ever having met B in person. The encryption system is no longer intended
+to be used by a pair of prespeci¯ed users, but by many senders wishing to send secret messages to a single
+recipient. The receiver keeps secret (to himself alone!) information (called the receiver's private key) about the
+public-key, which enables him to decrypt the cyphertexts he receives. We call such an encryption method public
+key encryption.
+We will show that secure public key encryption is possible given a trapdoor function. Informally, a trapdoor
+function is a one-way function for which there exists some trapdoor information known to the receiver alone,
+with which the receiver can invert the function. The idea of public-key cryptosystems and trapdoor functions
+was introduced in the seminal work of Di±e and Hellman in 1976 [71, 72]. Soon after the ¯rst implementations
+of their idea were proposed in [176], [170], [143].
+A simple construction of public key encryption from trapdoor functions goes as follows. Recipient B can choose
+at random a trapdoor function f and its associated trapdoor information t, and set its public key to be a
+description of f and its private key to be t. If A wants to send message m to B, A computes E (f; m) = f (m).
+To decrypt c = f (m), B computes f
+¡1
+(c) = f
+¡1
+(f (m)) = m. We will show that this construction is not secure
+enough in general, but construct probabilistic variants of it which are secure.
