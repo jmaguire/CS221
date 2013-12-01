@@ -1,6 +1,8 @@
 from Project import Document
-file = raw_input("file name ")
-doc = Document(file + '.txt')
+# file = raw_input("file name ")
+# doc = Document(file + '.txt')
+doc = Document('economist1.txt')
+
 
 ## Test Freq Distribution
 print 'Frequency Test'
@@ -34,3 +36,31 @@ print '5', doc.getSentenceOrginal(sent[4])
 with open('output.txt', 'w') as file:
     for i in [0,1,2,3,4]:
         file.write(doc.getSentenceOrginal(sent[i]) + ' ')
+print ' '
+
+
+## LDA
+doc.getLDA()
+
+## get MAP sentences by lda topic 1
+popular_sentences = {}
+for i in range(10):
+    sentences = doc.setencesByLDAFreqCloseness(i)
+    for j in range(5):
+        sentence = doc.getSentenceOrginal(sentences[j])
+        if sentence in popular_sentences:
+            popular_sentences[sentence] += 1
+        else:
+            popular_sentences[sentence] = 1
+           
+popular = sorted(popular_sentences, key=popular_sentences.get, reverse = True)
+print popular[0]
+print popular[1]
+print popular[2]
+print popular[3]
+print popular[4]
+
+with open('outputLDA.txt', 'w') as file:
+    for i in range(6):
+        file.write(popular[i] + ' ')
+
