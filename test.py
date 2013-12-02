@@ -1,9 +1,9 @@
 from Project import Document
 # filename = raw_input("file name ")
-filename = 'economist3'
+filename = 'newyorker1'
 doc = Document(filename + '.txt')
 # doc = Document('economist1.txt')
-print doc.documentOriginal
+
 
 ## Test Freq Distribution
 print 'Frequency Test'
@@ -45,7 +45,8 @@ print ' '
 from collections import Counter
 ## get MAP sentences by lda topic i
 popular = Counter()
-for n in range(20):
+for n in range(1):
+    print n
     doc.getLDA(6)
     for i in range(doc.topics):
         sentences = doc.setencesByLDAFreqCloseness(i)

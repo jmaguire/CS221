@@ -8,7 +8,7 @@ from itertools import izip
 from collections import defaultdict
 import string
 import numpy
-
+from collections import Counter
 
 class Document:
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -64,13 +64,22 @@ class Document:
         sentences = [elem[0] for elem in sentences]
         return sentences
     
-    ## Finds L1 distance between the document ldaDistribution and the distribution2
+    # Finds L1 distance between the document ldaDistribution and the distribution2
     def freqLDADistributionDistance(self,ldaDistribution,distribution2):
         samples = set(distribution2.samples())
         distance = 0
         for sample in samples:
             distance += abs(ldaDistribution[sample.lower()] - distribution2.freq(sample))
         return distance
+    
+        ## Finds L1 distance between the document ldaDistribution and the distribution2
+    def freqLDADistributionDistanceCounter(self,ldaDistribution,distribution2):
+        samples = set(list(distribution2.elements()))
+        distance = 0.0
+        for sample in samples:
+            distance += ldaDistribution[sample.lower()]*distribution2[sample]
+        return distance
+
     
     ## --------------------------------------
     ## --------------------------------------
@@ -91,8 +100,18 @@ class Document:
             for elem in vector:
                 d[elem[0]] = elem[1]
             self.ldaTopicDistributions.append(d)
-            
     
+    ## Return dictionary. Sentence = key, value = (topic,score)
+    def getTopicAndScore(self):
+        sentences = self.sentences
+        topicAndScore = {}
+        for sentence in sentences:
+            counts = Counter(sentence.split())
+            sentences = [(self.freqLDADistributionDistanceCounter(self.ldaTopicDistributions[topic],counts),topic) \
+                for topic in range(self.topics)]
+            score, topic = max(sentences)
+            topicAndScore[sentence] = (topic,score)
+        return topicAndScore
    
     ## condition on previous word    
     ## Takes list of sentences
