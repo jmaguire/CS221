@@ -76,11 +76,12 @@ class Document:
     ## --------------------------------------
     
     ## Get LDA for document
-    def getLDA(self):
+    def getLDA(self,topics):
+        self.topics = topics
         texts = [[word for word in sentence.lower().split()] for sentence in self.sentences]
         dictionary = corpora.Dictionary(texts)
         corpus = [dictionary.doc2bow(text) for text in texts]
-        self.lda = ldamodel.LdaModel(corpus, id2word=dictionary, num_topics=10)
+        self.lda = ldamodel.LdaModel(corpus, id2word=dictionary, num_topics=self.topics,passes=20)
         self.ldaTopicDistributions = []
         #for i in self.lda.show_topics(topn=len(dictionary)):
         for i in self.lda.show_topics():
