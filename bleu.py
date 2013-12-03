@@ -2,7 +2,7 @@ from __future__ import division
 from nltk.util import ngrams
 import math
 import nltk
-
+## https://github.com/HengfengLi/Higher-IBM-Models/blob/master/ibm3_bleu/bleu.py
 class BLEU(object):
     """
     This class implements the BLEU method, which is used to evaluate
