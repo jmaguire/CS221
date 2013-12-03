@@ -9,11 +9,13 @@ class LDATester(object):
     PATH = 'DATA/'
 
     @staticmethod
-    def compute(filename,topics = 5):
+    def compute(filename,topics = 2):
         doc = Document(LDATester.PATH + filename + '.txt')
         gold_doc = Document(LDATester.PATH + filename + '_gold.txt')
+        topics = len(gold_doc.sentences)
         ldaSummary = LDATester.getSummary(doc,topics)
-        return BLEU.compute(gold_doc.document,ldaSummary)
+        # print ldaSummary
+        return BLEU.computeNormalize(gold_doc.document,ldaSummary,ignore = True)
         
     @staticmethod
     def getSummary(doc,topics):
@@ -42,15 +44,17 @@ class LDATester(object):
         ## Statistical Cutoffs
         scores = [elem[1] for elem in topicAndScore.values()]
         mean, stdev = np.mean(scores), np.std(scores)
-        maxCutoff = mean + 1.5*stdev
+        maxCutoff = mean + 2*stdev
         minCutoff = mean - 1*stdev
        
         ## Collect Popular LDA sentences
         popular = []
-       
+        popular.append(doc.getSentenceOrginal(maxSent))
+        
         for topic in range(doc.topics):
+            
             if topic not in sentByTopics: continue
-            numToAdd = 3 if topic == maxTopic else 1
+            numToAdd = 1 if topic == maxTopic else 1
             scoreAndSents = [(sentence,topicAndScore[sentence][1]) for sentence in sentByTopics[topic]]
             scoreAndSents.sort(key = lambda x: x[1], reverse = True)
             if scoreAndSents[0][1] <= minCutoff: continue
@@ -62,7 +66,7 @@ class LDATester(object):
                     popular.append(doc.getSentenceOrginal(sentence))
                 numToAdd -= 1
                 index += 1
-
+        
         return ' '.join(popular)
         
 class Calibration(object):
@@ -71,7 +75,7 @@ class Calibration(object):
     def compute(filename):
         gold_doc = Document(LDATester.PATH + filename + '_gold.txt')
         calibration = Document(FrequencyTester.PATH + 'calibration.txt')
-        return BLEU.compute(gold_doc.document,calibration.document)
+        return BLEU.computeNormalize(gold_doc.document,calibration.document)
     
     
 class FrequencyTester(object):
@@ -81,8 +85,8 @@ class FrequencyTester(object):
     def compute(filename):
         doc = Document(FrequencyTester.PATH + filename + '.txt')
         gold_doc = Document(FrequencyTester.PATH + filename + '_gold.txt')
-        freqSummary = FrequencyTester.getSummary(doc,len(gold_doc.document))
-        return BLEU.compute(gold_doc.document,freqSummary)
+        freqSummary = FrequencyTester.getSummary(doc,len(gold_doc.sentences))
+        return BLEU.computeNormalize(gold_doc.document,freqSummary)
         
     @staticmethod
     def getSummary(doc,length):
@@ -96,7 +100,7 @@ if __name__ == "__main__":
     for i in range(10):
         filename = 'economist' + str(i + 1)
         print filename
-        ldaBleu = LDATester.compute(filename,topics = 5)
+        ldaBleu = LDATester.compute(filename,topics = 2)
         freqBleu = FrequencyTester.compute(filename)
         calibration = Calibration.compute(filename)
         line = [filename, ldaBleu, freqBleu, calibration]

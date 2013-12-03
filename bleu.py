@@ -76,7 +76,7 @@ class BLEU(object):
 
     """
     @staticmethod
-    def compute(candidate, reference, n = 4):
+    def compute(candidate, reference, n = 4,ignore = False):
         candidate = nltk.word_tokenize(candidate)
         reference = nltk.word_tokenize(reference)
         
@@ -85,7 +85,8 @@ class BLEU(object):
         reference = map(lambda x: x.lower(), reference) 
         
         bp = BLEU.brevity_penalty(candidate, reference)
-        
+        if ignore:
+            bp = 1
         s = 0.0
         i = 1
         for i in xrange(1,n+1,1): 
@@ -96,8 +97,8 @@ class BLEU(object):
         return bp * math.exp(s)
     
     @staticmethod
-    def computeNormalize(candidate, reference, n = 4):
-        return BLEU.compute(candidate,reference,n)/BLEU.compute(candidate,candidate,n)
+    def computeNormalize(candidate, reference, n = 4, ignore = False):
+        return BLEU.compute(candidate,reference,n,ignore)/BLEU.compute(candidate,candidate,n,ignore)
 
         
     @staticmethod
