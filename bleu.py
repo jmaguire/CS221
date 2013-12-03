@@ -88,13 +88,11 @@ class BLEU(object):
         
         s = 0.0
         i = 1
-        for n in xrange(1,n+1,1): 
+        for i in xrange(1,n+1,1): 
             weight = 1.0/i
             p_n = BLEU.modified_precision(candidate, reference, i)
-            print p_n
             if p_n != 0:
                 s += weight * math.log(p_n)
-            i += 1
         return bp * math.exp(s)
     
     @staticmethod
@@ -122,7 +120,6 @@ class BLEU(object):
             count = reference_ngrams.count(word) + 1
             if count > count_max:
                 count_max = count
-        
         return min(count_w, count_max) / (len(candidate) + len(c_words))
 
     @staticmethod
@@ -139,7 +136,6 @@ class BLEU(object):
 # run doctests
 if __name__ == "__main__":
     sent1 = 'I went to the park and saw a small dog. He ate his mother.' 
-    sent2 = 'I traveled to the park and saw a small dog. The dog ate his mother' 
-
+    sent2 = 'Chicken Noodle Soup' 
     print BLEU.computeNormalize(sent1,sent2)
     
