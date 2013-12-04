@@ -3,7 +3,7 @@ from collections import Counter
 import numpy as np
 from bleu import BLEU
 import csv
-
+import random,time,datetime
 
 class LDATester(object):
     PATH = 'DATA/'
@@ -74,8 +74,16 @@ class Calibration(object):
     @staticmethod
     def compute(filename):
         gold_doc = Document(LDATester.PATH + filename + '_gold.txt')
-        calibration = Document(FrequencyTester.PATH + 'calibration.txt')
-        return BLEU.computeNormalize(gold_doc.document,calibration.document)
+        doc = Document(LDATester.PATH + filename + '.txt')
+        
+        ## Get random summary
+        indices = [x for x in range(len(doc.sentences))]
+        random.shuffle(indices)
+        indices = indices[0:len(gold_doc.sentences)] 
+        sentences = [doc.sentences[i] for i in indices] 
+        calibration = [doc.getSentenceOrginal(sentence) for sentence in sentences]
+        calibration = ' '.join(calibration)
+        return BLEU.computeNormalize(gold_doc.document,calibration)
     
     
 class FrequencyTester(object):
@@ -86,25 +94,38 @@ class FrequencyTester(object):
         doc = Document(FrequencyTester.PATH + filename + '.txt')
         gold_doc = Document(FrequencyTester.PATH + filename + '_gold.txt')
         freqSummary = FrequencyTester.getSummary(doc,len(gold_doc.sentences))
-        return BLEU.computeNormalize(gold_doc.document,freqSummary)
+        return BLEU.computeNormalize(gold_doc.document,freqSummary,ignore = True)
         
     @staticmethod
     def getSummary(doc,length):
         ## Get key sentence
         popular = doc.setencesByFreqCloseness()
         popular = popular[0:length]
+        popular = [doc.getSentenceOrginal(sentence) for sentence in popular]
         return ' '.join(popular)
 
 if __name__ == "__main__":
-    output = [['Filename','BLEU Score LDA', 'BLEU Score Frequency', 'Calibration']]
-    for i in range(10):
-        filename = 'economist' + str(i + 1)
-        print filename
-        ldaBleu = LDATester.compute(filename,topics = 2)
-        freqBleu = FrequencyTester.compute(filename)
-        calibration = Calibration.compute(filename)
-        line = [filename, ldaBleu, freqBleu, calibration]
-        output.append(line)
-    with open('Data/BLEU_Score.csv', 'wb') as f:
+    title = ['Filename','BLEU Score LDA', 'BLEU Score Frequency', 'Calibration']
+    results = {}
+    iterations = 5
+    documents = 17
+    for j in range(iterations):
+        print 'iteration', j
+        for i in range(documents):
+            filename = 'economist' + str(i + 1)
+            print filename
+            ldaBleu = LDATester.compute(filename,topics = 2)
+            freqBleu = FrequencyTester.compute(filename)
+            calibration = Calibration.compute(filename)
+            if filename not in results:
+                results[filename] = np.array([ldaBleu,freqBleu,calibration])
+            else:
+                results[filename]  += np.array([ldaBleu,freqBleu,calibration])
+
+    ts = time.time()
+    st = datetime.datetime.fromtimestamp(ts).strftime('%H_%M_%S')
+    with open('Data/BLEU_Score_' + st + '.csv', 'wb') as f:
         writer = csv.writer(f)
-        writer.writerows(output)
+        writer.writerow(title)
+        for key in results:
+            writer.writerow([key] + list(results[key]/documents*1.0))
