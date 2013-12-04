@@ -128,4 +128,4 @@ if __name__ == "__main__":
         writer = csv.writer(f)
         writer.writerow(title)
         for key in results:
-            writer.writerow([key] + list(results[key]/documents*1.0))
+            writer.writerow([key] + list(results[key]/iterations*1.0))
